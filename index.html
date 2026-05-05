@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3Ptag Tournament System</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f0f13;
+  --surface: #1a1a24;
+  --surface2: #22222f;
+  --border: #2e2e3e;
+  --border2: #3a3a4e;
+  --text: #f0eff5;
+  --text2: #9896a8;
+  --text3: #6b6979;
+  --accent: #ff3d6e;
+  --accent2: #ff6b8a;
+  --green: #22c55e;
+  --amber: #f59e0b;
+  --blue: #3b82f6;
+  --purple: #a855f7;
+  --red: #ef4444;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; min-height: 100vh; }
+
+/* Header */
+.header {
+  background: linear-gradient(135deg, #1a1a24 0%, #0f0f18 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 56px; position: sticky; top: 0; z-index: 100;
+}
+.logo { display: flex; align-items: center; gap: 10px; }
+.logo-mark { width: 32px; height: 32px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: white; }
+.logo-text { font-weight: 700; font-size: 15px; letter-spacing: -0.3px; }
+.logo-sub { font-size: 11px; color: var(--text3); font-weight: 400; }
+.header-right { display: flex; align-items: center; gap: 12px; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); }
+.status-text { font-size: 12px; color: var(--text3); }
+
+/* Layout */
+.layout { display: flex; min-height: calc(100vh - 56px); }
+
+/* Sidebar */
+.sidebar {
+  width: 200px; flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 16px 12px;
+}
+.nav-label { font-size: 10px; font-weight: 600; color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase; padding: 0 8px; margin-bottom: 6px; margin-top: 16px; }
+.nav-label:first-child { margin-top: 0; }
+.nav-btn {
+  width: 100%; display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; border-radius: 6px; border: none;
+  background: transparent; color: var(--text2); cursor: pointer;
+  font-size: 13px; font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s; text-align: left; margin-bottom: 2px;
+}
+.nav-btn:hover { background: var(--surface2); color: var(--text); }
+.nav-btn.active { background: rgba(255,61,110,0.15); color: var(--accent2); font-weight: 500; }
+.nav-icon { font-size: 15px; width: 20px; text-align: center; }
+
+/* Main */
+.main { flex: 1; padding: 24px; overflow-y: auto; }
+
+/* Sections */
+.section { display: none; }
+.section.visible { display: block; }
+
+/* Page title */
+.page-title { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 4px; }
+.page-sub { font-size: 13px; color: var(--text3); margin-bottom: 20px; }
+
+/* Stats */
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px; }
+.stat-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px;
+}
+.stat-val { font-size: 28px; font-weight: 700; letter-spacing: -1px; color: var(--text); }
+.stat-label { font-size: 11px; color: var(--text3); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.05em; }
+.stat-card.accent { border-color: rgba(255,61,110,0.3); background: rgba(255,61,110,0.05); }
+.stat-card.accent .stat-val { color: var(--accent2); }
+
+/* Cards */
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px; margin-bottom: 10px;
+  transition: border-color 0.15s;
+}
+.card:hover { border-color: var(--border2); }
+.card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.card-title { font-size: 14px; font-weight: 600; }
+
+/* Badges */
+.badge { font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 20px; display: inline-block; }
+.b-green { background: rgba(34,197,94,0.15); color: #4ade80; }
+.b-amber { background: rgba(245,158,11,0.15); color: #fbbf24; }
+.b-red { background: rgba(239,68,68,0.15); color: #f87171; }
+.b-blue { background: rgba(59,130,246,0.15); color: #60a5fa; }
+.b-gray { background: rgba(107,105,121,0.2); color: var(--text2); }
+.b-purple { background: rgba(168,85,247,0.15); color: #c084fc; }
+.b-pink { background: rgba(255,61,110,0.15); color: var(--accent2); }
+
+/* Meta */
+.meta { font-size: 12px; color: var(--text3); }
+
+/* Progress */
+.progress { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin-top: 8px; }
+.progress-fill { height: 100%; border-radius: 2px; background: var(--accent); transition: width 0.3s; }
+
+/* Task rows */
+.task-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.task-row:last-child { border-bottom: none; }
+.task-check {
+  width: 16px; height: 16px; border-radius: 4px;
+  border: 1.5px solid var(--border2); flex-shrink: 0;
+  cursor: pointer; display: flex; align-items: center;
+  justify-content: center; font-size: 10px; background: transparent;
+  transition: all 0.15s;
+}
+.task-check.done { background: var(--green); border-color: var(--green); color: white; }
+.task-text { flex: 1; font-size: 13px; color: var(--text); }
+.task-text.done { text-decoration: line-through; color: var(--text3); }
+.task-due { font-size: 11px; padding: 2px 7px; border-radius: 10px; white-space: nowrap; }
+.due-ok { background: rgba(34,197,94,0.12); color: #4ade80; }
+.due-warn { background: rgba(245,158,11,0.12); color: #fbbf24; }
+.due-late { background: rgba(239,68,68,0.12); color: #f87171; }
+
+/* Forms */
+.form-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 10px; }
+.form-group { display: flex; flex-direction: column; gap: 4px; }
+.form-group label { font-size: 11px; color: var(--text3); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+.form-group input, .form-group select {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 6px; padding: 8px 10px; color: var(--text);
+  font-size: 13px; font-family: 'DM Sans', sans-serif;
+  outline: none; transition: border-color 0.15s;
+}
+.form-group input:focus, .form-group select:focus { border-color: var(--accent); }
+.form-group select option { background: var(--surface2); }
+
+/* Buttons */
+.btn { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 13px; font-weight: 500; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+.btn-primary { background: var(--accent); color: white; }
+.btn-primary:hover { background: var(--accent2); }
+.btn-ghost { background: transparent; color: var(--text2); border: 1px solid var(--border); }
+.btn-ghost:hover { background: var(--surface2); color: var(--text); }
+.btn-danger { background: transparent; color: #f87171; border: 1px solid rgba(239,68,68,0.2); font-size: 12px; padding: 4px 10px; }
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+
+/* Section heading */
+.sh { font-size: 11px; font-weight: 600; color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; margin: 20px 0 8px; }
+.sh:first-child { margin-top: 0; }
+
+/* Empty */
+.empty { font-size: 13px; color: var(--text3); padding: 30px 0; text-align: center; }
+
+/* Avatar */
+.av { border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 600; flex-shrink: 0; font-size: 10px; }
+.av-Teagz { background: rgba(168,85,247,0.2); color: #c084fc; }
+.av-Matt { background: rgba(59,130,246,0.2); color: #60a5fa; }
+.av-Sienna { background: rgba(245,158,11,0.2); color: #fbbf24; }
+.av-Ebony { background: rgba(236,72,153,0.2); color: #f472b6; }
+.av-Kez { background: rgba(34,197,94,0.2); color: #4ade80; }
+.av-All { background: rgba(107,105,121,0.2); color: var(--text2); }
+
+/* Filter tabs */
+.filter-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.filter-tab { font-size: 12px; padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border); background: transparent; cursor: pointer; color: var(--text3); font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+.filter-tab:hover { border-color: var(--border2); color: var(--text2); }
+.filter-tab.active { background: rgba(255,61,110,0.15); border-color: rgba(255,61,110,0.3); color: var(--accent2); }
+
+/* Loading / message */
+.loading { text-align: center; padding: 40px; color: var(--text3); font-size: 13px; }
+.msg-bar { padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 12px; }
+.msg-error { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); color: #f87171; }
+.msg-success { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2); color: #4ade80; }
+.msg-info { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2); color: #60a5fa; }
+.inline-msg { font-size: 12px; margin-left: 10px; }
+
+/* Week grid */
+.wk-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 16px; }
+.wk-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px; }
+.wk-label { font-size: 11px; font-weight: 600; margin-bottom: 8px; }
+.wk-item { font-size: 11px; color: var(--text3); padding: 3px 0; border-bottom: 1px solid var(--border); display: flex; gap: 6px; align-items: flex-start; }
+.wk-item:last-child { border-bottom: none; }
+.wk-dot { width: 4px; height: 4px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+
+/* Team card */
+.team-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
+
+/* Comms table */
+.comms-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.comms-table th { font-size: 10px; font-weight: 600; color: var(--text3); text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: 0.06em; }
+.comms-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.comms-table tr:last-child td { border-bottom: none; }
+
+/* Ninety */
+.ninety-check { width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--border2); flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 9px; background: transparent; }
+.ninety-check.done { background: var(--green); border-color: var(--green); color: white; }
+
+/* Cost row */
+.cost-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.cost-row:last-child { border-bottom: none; }
+
+/* Modal */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; display: flex; align-items: center; justify-content: center; }
+.modal { background: var(--surface); border: 1px solid var(--border2); border-radius: 12px; padding: 24px; width: 90%; max-width: 500px; }
+.modal-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; color: var(--text); }
+.modal-actions { display: flex; gap: 8px; margin-top: 16px; justify-content: flex-end; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* Responsive */
+@media (max-width: 700px) {
+  .sidebar { display: none; }
+  .main { padding: 16px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <div class="logo-mark">3P</div>
+    <div>
+      <div class="logo-text">3Ptag</div>
+      <div class="logo-sub">Tournament System</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="status-dot"></div>
+    <div class="status-text" id="conn-status">Connecting...</div>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="nav-label">Overview</div>
+    <button class="nav-btn active" onclick="show('dashboard',this)"><span class="nav-icon">📊</span>Dashboard</button>
+    <button class="nav-btn" onclick="show('tournaments',this)"><span class="nav-icon">🏆</span>Tournaments</button>
+
+    <div class="nav-label">Operations</div>
+    <button class="nav-btn" onclick="show('tasks',this)"><span class="nav-icon">✅</span>Tasks</button>
+    <button class="nav-btn" onclick="show('costs',this)"><span class="nav-icon">💰</span>Costs</button>
+
+    <div class="nav-label">Planning</div>
+    <button class="nav-btn" onclick="show('template',this)"><span class="nav-icon">📋</span>6-week plan</button>
+    <button class="nav-btn" onclick="show('comms',this)"><span class="nav-icon">📣</span>Comms</button>
+    <button class="nav-btn" onclick="show('ninety',this)"><span class="nav-icon">🎯</span>90-day actions</button>
+
+    <div class="nav-label">Team</div>
+    <button class="nav-btn" onclick="show('team',this)"><span class="nav-icon">👥</span>Team</button>
+  </div>
+
+  <div class="main">
+    <div id="msg-area"></div>
+
+    <!-- DASHBOARD -->
+    <div id="s-dashboard" class="section visible">
+      <div class="page-title">Dashboard</div>
+      <div class="page-sub">3Ptag 2026–27 season overview</div>
+      <div class="stat-grid" id="dash-stats"><div class="loading">Loading...</div></div>
+      <p class="sh">Tournament calendar</p>
+      <div id="dash-tournaments"></div>
+      <p class="sh">Upcoming deadlines</p>
+      <div id="dash-deadlines"></div>
+    </div>
+
+    <!-- TOURNAMENTS -->
+    <div id="s-tournaments" class="section">
+      <div class="page-title">Tournaments</div>
+      <div class="page-sub">Manage your 2026–27 events</div>
+      <div class="form-card">
+        <p class="sh" style="margin-top:0;">Add tournament</p>
+        <div class="form-grid">
+          <div class="form-group" style="grid-column:span 2;"><label>Tournament name</label><input id="tn-name" type="text" placeholder="e.g. Schools Challenge 2027"></div>
+          <div class="form-group"><label>Start date</label><input id="tn-start" type="date"></div>
+          <div class="form-group"><label>End date</label><input id="tn-end" type="date"></div>
+          <div class="form-group"><label>Location</label><input id="tn-loc" type="text" placeholder="Venue / suburb"></div>
+          <div class="form-group"><label>Budget ($)</label><input id="tn-budget" type="number" placeholder="0" min="0"></div>
+          <div class="form-group"><label>Status</label><select id="tn-status"><option>Planning</option><option>Active</option><option>Complete</option></select></div>
+        </div>
+        <button class="btn btn-primary" onclick="addTournament()">+ Add tournament</button>
+        <span class="inline-msg" id="tn-msg"></span>
+      </div>
+      <div id="tournament-list"><div class="loading">Loading tournaments...</div></div>
+    </div>
+
+    <!-- TASKS -->
+    <div id="s-tasks" class="section">
+      <div class="page-title">Tasks</div>
+      <div class="page-sub">Track and assign tournament tasks</div>
+      <div class="form-card">
+        <p class="sh" style="margin-top:0;">Add task</p>
+        <div class="form-grid">
+          <div class="form-group" style="grid-column:span 2;"><label>Task name</label><input id="t-name" type="text" placeholder="e.g. Order bibs"></div>
+          <div class="form-group"><label>Tournament</label><select id="t-tourn"></select></div>
+          <div class="form-group"><label>Owner</label><select id="t-owner"><option>Teagz</option><option>Matt</option><option>Sienna</option><option>Ebony</option><option>Kez</option></select></div>
+          <div class="form-group"><label>Due date</label><input id="t-due" type="date"></div>
+          <div class="form-group"><label>Category</label><select id="t-cat"><option>Officials</option><option>Comms</option><option>Content</option><option>Event Prep</option><option>Registration</option><option>Equipment</option><option>Venue</option><option>Finance</option><option>Logistics</option><option>Other</option></select></div>
+        </div>
+        <button class="btn btn-primary" onclick="addTask()">+ Add task</button>
+        <span class="inline-msg" id="t-msg"></span>
+      </div>
+      <div class="filter-row" id="task-filters"></div>
+      <div id="task-list"><div class="loading">Loading tasks...</div></div>
+    </div>
+
+    <!-- COSTS -->
+    <div id="s-costs" class="section">
+      <div class="page-title">Costs</div>
+      <div class="page-sub">Track tournament budgets and expenses</div>
+      <div class="form-card">
+        <p class="sh" style="margin-top:0;">Add expense</p>
+        <div class="form-grid">
+          <div class="form-group" style="grid-column:span 2;"><label>Description</label><input id="c-name" type="text" placeholder="e.g. Venue hire"></div>
+          <div class="form-group"><label>Tournament</label><select id="c-tourn"></select></div>
+          <div class="form-group"><label>Budgeted ($)</label><input id="c-budget-amt" type="number" placeholder="0" min="0"></div>
+          <div class="form-group"><label>Actual ($)</label><input id="c-actual-amt" type="number" placeholder="0" min="0"></div>
+          <div class="form-group"><label>Category</label><select id="c-cat"><option>Administration</option><option>Balls</option><option>Combined Tournament Costs</option><option>Content</option><option>Core Flutes</option><option>Council & Permits</option><option>Entertainment</option><option>Equipment</option><option>Event Hire</option><option>First Aid & Medical</option><option>Flags</option><option>Grants & Funding</option><option>Insurance</option><option>Line marking</option><option>Live Streaming & AV</option><option>Marketing</option><option>MC/DJ</option><option>Merchandise Sales</option><option>MVP Medals</option><option>Officials</option><option>Player Registrations</option><option>Postage</option><option>Prize Shirts</option><option>Project Management (M&T)</option><option>Referees</option><option>Security</option><option>Sponsorship</option><option>Struddys (Uniforms & Apparel)</option><option>Tags</option><option>Team Medals</option><option>Team Registrations</option><option>Toilets & Cleaning</option><option>Tournament Set up / Clutch Crew</option><option>Tournament Supplies (Field)</option><option>Tournament Supplies (Food & Drinks)</option><option>Traffic Control</option><option>Travel & Accommodation</option><option>Vendors (Site Fees)</option><option>Venue & Field Hire</option><option>Whistles</option></select></div>
+          <div class="form-group"><label>Status</label><select id="c-status"><option>Budgeted</option><option>Ordered</option><option>Paid</option></select></div>
+        </div>
+        <button class="btn btn-primary" onclick="addCost()">+ Add expense</button>
+        <span class="inline-msg" id="c-msg"></span>
+      </div>
+      <div id="cost-list"><div class="loading">Loading costs...</div></div>
+    </div>
+
+    <!-- 6-WEEK TEMPLATE -->
+    <div id="s-template" class="section">
+      <div class="page-title">6-week plan</div>
+      <div class="page-sub">Standard countdown template — from your planning day</div>
+      <div class="wk-grid">
+        <div class="wk-card"><div class="wk-label" style="color:#60a5fa;">Week 6 — Officials & launch</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#60a5fa;"></div>Signed contracts + blue cards</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#60a5fa;"></div>Lock in officials + ref uniform order</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#60a5fa;"></div>Send tournament info to all</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#60a5fa;"></div>Create WhatsApp group</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#60a5fa;"></div>Activations locked</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#60a5fa;"></div>Official kit reveal content</div>
+        </div>
+        <div class="wk-card"><div class="wk-label" style="color:#fbbf24;">Week 5 — Rosters & sponsors</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#fbbf24;"></div>Email rosters to officials</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#fbbf24;"></div>Sponsor + VIP invites sent</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#fbbf24;"></div>Division + pools content</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#fbbf24;"></div>Sort prizes into boxes</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#fbbf24;"></div>Refs and officials comms</div>
+        </div>
+        <div class="wk-card"><div class="wk-label" style="color:#c084fc;">Week 4 — Vendors & draw</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#c084fc;"></div>Vendor map + vendor posts</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#c084fc;"></div>Field map / info / draw</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#c084fc;"></div>Roster changes confirmed</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#c084fc;"></div>Letter box drop</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#c084fc;"></div>Sponsor content + styles</div>
+        </div>
+        <div class="wk-card"><div class="wk-label" style="color:#f87171;">Week 3 — Presentation & hype</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#f87171;"></div>Presentation + ref days</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#f87171;"></div>Replacement players confirmed</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#f87171;"></div>Staff presentation</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#f87171;"></div>Sponsors shoutout content</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#f87171;"></div>Truck booking</div>
+        </div>
+        <div class="wk-card"><div class="wk-label" style="color:#4ade80;">Week 2 — Final prep</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#4ade80;"></div>Ref day</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#4ade80;"></div>Final tournament info send</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#4ade80;"></div>Last year MVP content</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#4ade80;"></div>Managers confirmation email</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#4ade80;"></div>Printing field boxes</div>
+        </div>
+        <div class="wk-card"><div class="wk-label" style="color:var(--text2);">Week 1 — Event week</div>
+          <div class="wk-item"><div class="wk-dot" style="background:var(--text2);"></div>Field set up + line marking</div>
+          <div class="wk-item"><div class="wk-dot" style="background:var(--text2);"></div>Officials check in</div>
+          <div class="wk-item"><div class="wk-dot" style="background:var(--text2);"></div>Road to finals graphic</div>
+          <div class="wk-item"><div class="wk-dot" style="background:var(--text2);"></div>Shopping + event supplies</div>
+          <div class="wk-item"><div class="wk-dot" style="background:var(--text2);"></div>Key collection + drop off</div>
+        </div>
+      </div>
+      <p class="sh">Apply template to tournament</p>
+      <div class="form-card">
+        <div class="form-grid">
+          <div class="form-group" style="grid-column:span 2;"><label>Select tournament</label><select id="tpl-tourn"></select></div>
+          <div class="form-group"><label>Event date (if different)</label><input id="tpl-date" type="date"></div>
+        </div>
+        <button class="btn btn-primary" onclick="applyTemplate()">Apply 6-week template</button>
+        <span class="inline-msg" id="tpl-msg"></span>
+      </div>
+      <p class="sh">Post-event checklist</p>
+      <div class="card">
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <span class="badge b-gray">Award winners announced</span>
+          <span class="badge b-gray">MVP / lvl / sprint / champs posts</span>
+          <span class="badge b-gray">Sponsors thanked</span>
+          <span class="badge b-gray">Thanks + feedback email</span>
+          <span class="badge b-gray">Summary report — Matt</span>
+          <span class="badge b-gray">Delegate debrief — Kez</span>
+          <span class="badge b-gray">Starting 7 post</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMMS -->
+    <div id="s-comms" class="section">
+      <div class="page-title">Comms plan</div>
+      <div class="page-sub">Channel owners and communication sequences</div>
+      <p class="sh">Channels & owners</p>
+      <div class="card">
+        <table class="comms-table">
+          <thead><tr><th>Channel</th><th>Purpose</th><th>Owner</th><th>When</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Instagram / TikTok / Facebook</strong></td><td style="color:var(--text3);">Hype, highlights, branding</td><td><span class="av av-Matt" style="width:20px;height:20px;">Ma</span> Matt</td><td><span class="badge b-blue">Ongoing</span></td></tr>
+            <tr><td><strong>Stories</strong></td><td style="color:var(--text3);">Reminders, updates, live info</td><td><span class="av av-Matt" style="width:20px;height:20px;">Ma</span> writes · <span class="av av-Teagz" style="width:20px;height:20px;">Te</span> approves</td><td><span class="badge b-blue">Weekly+</span></td></tr>
+            <tr><td><strong>The Drop</strong></td><td style="color:var(--text3);">Early news, key reminders</td><td><span class="av av-Teagz" style="width:20px;height:20px;">Te</span> Teagz</td><td><span class="badge b-gray">Per campaign</span></td></tr>
+            <tr><td><strong>Email</strong></td><td style="color:var(--text3);">Info, confirmation, updates</td><td><span class="av av-Sienna" style="width:20px;height:20px;">Si</span> writes · <span class="av av-Kez" style="width:20px;height:20px;">Ke</span> checks</td><td><span class="badge b-gray">Milestones</span></td></tr>
+            <tr><td><strong>Website</strong></td><td style="color:var(--text3);">Source of truth</td><td><span class="av av-Teagz" style="width:20px;height:20px;">Te</span> Teagz · <span class="av av-Sienna" style="width:20px;height:20px;">Si</span> Sienna</td><td><span class="badge b-blue">Ongoing</span></td></tr>
+            <tr><td><strong>Text / SMS</strong></td><td style="color:var(--text3);">Urgent only</td><td><span class="av av-Kez" style="width:20px;height:20px;">Ke</span> Kez</td><td><span class="badge b-red">Urgent only</span></td></tr>
+            <tr><td><strong>Internal platform</strong></td><td style="color:var(--text3);">Staff only</td><td><span class="av av-Sienna" style="width:20px;height:20px;">Si</span> Sienna</td><td><span class="badge b-blue">Ongoing</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="sh">Registration launch sequence</p>
+      <div class="wk-grid">
+        <div class="wk-card"><div class="wk-label" style="color:#60a5fa;">6–7 weeks out</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#60a5fa;"></div>Ambassador CTA</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#60a5fa;"></div>Launch info released</div>
+        </div>
+        <div class="wk-card"><div class="wk-label" style="color:#fbbf24;">4–5 weeks out</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#fbbf24;"></div>Jersey refresh post</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#fbbf24;"></div>NSW/QLD countdown</div>
+        </div>
+        <div class="wk-card"><div class="wk-label" style="color:#c084fc;">3–4 weeks out</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#c084fc;"></div>Sponsors post</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#c084fc;"></div>Launch reminders</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#c084fc;"></div>New rego process comms</div>
+        </div>
+        <div class="wk-card"><div class="wk-label" style="color:#4ade80;">Launch day</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#4ade80;"></div>Notice (MC)</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#4ade80;"></div>Launch goes live</div>
+          <div class="wk-item"><div class="wk-dot" style="background:#4ade80;"></div>Automated emails sent</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 90-DAY ACTIONS -->
+    <div id="s-ninety" class="section">
+      <div class="page-title">90-day actions</div>
+      <div class="page-sub">Individual actions from your planning day — tick off as completed</div>
+      <div id="ninety-list"></div>
+    </div>
+
+    <!-- TEAM -->
+    <div id="s-team" class="section">
+      <div class="page-title">Team</div>
+      <div class="page-sub">Teagz · Matt · Sienna · Ebony · Kez</div>
+      <div id="team-list"><div class="loading">Loading...</div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- EDIT COST MODAL -->
+<div id="edit-modal" class="modal-overlay" style="display:none;">
+  <div class="modal">
+    <div class="modal-title">✏️ Edit expense</div>
+    <input type="hidden" id="edit-id">
+    <div class="form-grid">
+      <div class="form-group" style="grid-column:span 2;"><label>Description</label><input id="edit-name" type="text"></div>
+      <div class="form-group"><label>Budgeted ($)</label><input id="edit-budget" type="number" min="0"></div>
+      <div class="form-group"><label>Actual ($)</label><input id="edit-actual" type="number" min="0"></div>
+      <div class="form-group"><label>Category</label><select id="edit-cat"><option>Administration</option><option>Balls</option><option>Combined Tournament Costs</option><option>Content</option><option>Core Flutes</option><option>Council & Permits</option><option>Entertainment</option><option>Equipment</option><option>Event Hire</option><option>First Aid & Medical</option><option>Flags</option><option>Grants & Funding</option><option>Insurance</option><option>Line marking</option><option>Live Streaming & AV</option><option>Marketing</option><option>MC/DJ</option><option>Merchandise Sales</option><option>MVP Medals</option><option>Officials</option><option>Player Registrations</option><option>Postage</option><option>Prize Shirts</option><option>Project Management (M&T)</option><option>Referees</option><option>Security</option><option>Sponsorship</option><option>Struddys (Uniforms & Apparel)</option><option>Tags</option><option>Team Medals</option><option>Team Registrations</option><option>Toilets & Cleaning</option><option>Tournament Set up / Clutch Crew</option><option>Tournament Supplies (Field)</option><option>Tournament Supplies (Food & Drinks)</option><option>Traffic Control</option><option>Travel & Accommodation</option><option>Vendors (Site Fees)</option><option>Venue & Field Hire</option><option>Whistles</option></select></div>
+      <div class="form-group"><label>Status</label><select id="edit-status"><option>Budgeted</option><option>Ordered</option><option>Paid</option></select></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeEditModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEdit()">Save changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT TASK MODAL -->
+<div id="edit-task-modal" class="modal-overlay" style="display:none;">
+  <div class="modal">
+    <div class="modal-title">✏️ Edit task</div>
+    <input type="hidden" id="edit-task-id">
+    <div class="form-grid">
+      <div class="form-group" style="grid-column:span 2;"><label>Task name</label><input id="edit-task-name" type="text"></div>
+      <div class="form-group"><label>Owner</label><select id="edit-task-owner"><option>Teagz</option><option>Matt</option><option>Sienna</option><option>Ebony</option><option>Kez</option></select></div>
+      <div class="form-group"><label>Due date</label><input id="edit-task-due" type="date"></div>
+      <div class="form-group"><label>Category</label><select id="edit-task-cat"><option>Officials</option><option>Comms</option><option>Content</option><option>Event Prep</option><option>Registration</option><option>Equipment</option><option>Venue</option><option>Finance</option><option>Logistics</option><option>Other</option></select></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeEditTaskModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveTaskEdit()">Save changes</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// AIRTABLE CONFIG
+// ============================================================
+const AT_TOKEN = atob('cGF0OHBUOERHaGZxUlBmUzguMGM2YTQ5MWYyMDgxMTVmNjM3N2EwODkyOWZlOTRhYTQxODI2NzU2YWZlMDY2MzFkMTQ1OTczZDIyYjNjNWU2Ng==');
+const AT_BASE = 'app2uug5iopwDSPaQ';
+const AT_URL = `https://api.airtable.com/v0/${AT_BASE}`;
+
+const HEADERS = {
+  'Authorization': `Bearer ${AT_TOKEN}`,
+  'Content-Type': 'application/json'
+};
+
+const TEAM = ['Teagz','Matt','Sienna','Ebony','Kez'];
+let state = { tournaments: [], tasks: [], costs: [] };
+let taskFilter = 'All';
+
+// 90-day actions
+const NINETY = {
+  Teagz: ['Set values','Website update','Prospectus','Struddys (uniform sizing)','Brand collabs','China order','Content plan'],
+  Matt: ['Set values','Meeting with RAKS','Schools content planning','Shoot school content','Write staff partnership email','Connect with contra sponsors','Struddys meeting','Grant writing','Accounting meeting — staff plan'],
+  Kez: ['Meeting with RAKS','Compile list of changes for RAKS','Create outreach list','Tournament costings','Schools budget','Accounting','Learn grants writing + explore new grants'],
+  Sienna: ['Ambassador check in — sizing & content','Vendor pricing structure','Feedback forms','Schools emails — rego','Mods email — launch + reminder','Launch date announcement','Month out announcement','1 week till launch comms','Draw + fields + info post','Manager info confirm','Thank you / feedback / awards comms'],
+  Ebony: ['Incident playbook','Support team across all tournaments']
+};
+let ninetyDone = {};
+try { ninetyDone = JSON.parse(localStorage.getItem('3ptag_ninety')||'{}'); } catch(e){}
+
+// ============================================================
+// AIRTABLE API
+// ============================================================
+async function atGet(table) {
+  try {
+    let records = [], offset = null;
+    do {
+      const url = `${AT_URL}/${encodeURIComponent(table)}?pageSize=100${offset?'&offset='+offset:''}`;
+      const r = await fetch(url, { headers: HEADERS });
+      if (!r.ok) throw new Error(`${r.status}`);
+      const d = await r.json();
+      records = records.concat(d.records);
+      offset = d.offset;
+    } while (offset);
+    return records;
+  } catch(e) {
+    console.error('Airtable GET error:', e);
+    return null;
+  }
+}
+
+async function atPost(table, fields) {
+  const r = await fetch(`${AT_URL}/${encodeURIComponent(table)}`, {
+    method: 'POST', headers: HEADERS,
+    body: JSON.stringify({ records: [{ fields }] })
+  });
+  if (!r.ok) { const e = await r.text(); throw new Error(e); }
+  const d = await r.json();
+  return d.records[0];
+}
+
+async function atPatch(table, id, fields) {
+  const r = await fetch(`${AT_URL}/${encodeURIComponent(table)}/${id}`, {
+    method: 'PATCH', headers: HEADERS,
+    body: JSON.stringify({ fields })
+  });
+  if (!r.ok) { const e = await r.text(); throw new Error(e); }
+  return await r.json();
+}
+
+async function atDelete(table, id) {
+  const r = await fetch(`${AT_URL}/${encodeURIComponent(table)}/${id}`, {
+    method: 'DELETE', headers: HEADERS
+  });
+  if (!r.ok) { const e = await r.text(); throw new Error(e); }
+}
+
+// ============================================================
+// DATA LOADING
+// ============================================================
+async function loadAll() {
+  setConnStatus('Connecting...', false);
+  showMsg('Loading your data from Airtable...', 'info');
+
+  const [tournaments, tasks, costs] = await Promise.all([
+    atGet('Tournaments'),
+    atGet('Tasks'),
+    atGet('Costs')
+  ]);
+
+  if (tournaments === null) {
+    setConnStatus('Offline — demo mode', false);
+    showMsg('Could not connect to Airtable. Check your internet connection.', 'error');
+    loadFallback();
+    return;
+  }
+
+  state.tournaments = tournaments.map(r => ({
+    id: r.id,
+    name: r.fields['Description'] || r.fields['Name'] || r.fields['Tournament name'] || r.fields['Title'] || '',
+    location: r.fields['Location'] || '',
+    date: r.fields['Start Date'] || r.fields['Start date'] || '',
+    end: r.fields['End Date'] || r.fields['End date'] || '',
+    budget: r.fields['Budget'] || 0,
+    status: r.fields['Status'] || 'Planning'
+  }));
+
+  state.tasks = tasks.map(r => ({
+    id: r.id,
+    name: r.fields['Description'] || r.fields['Name'] || r.fields['Task name'] || r.fields['Title'] || '',
+    tournament: r.fields['Tournament'] || '',
+    owner: r.fields['Owner'] || '',
+    due: r.fields['Due Date'] || r.fields['Due date'] || '',
+    cat: r.fields['Category'] || '',
+    done: r.fields['Done'] || false
+  }));
+
+  state.costs = costs.map(r => ({
+    id: r.id,
+    name: r.fields['Description'] || r.fields['Name'] || r.fields['Title'] || '',
+    tournament: r.fields['Tournament'] || '',
+    amount: r.fields['Budgeted Amount'] || r.fields['Amount'] || 0,
+    actual: r.fields['Actual Amount'] || 0,
+    cat: r.fields['Category'] || '',
+    status: r.fields['Status'] || 'Budgeted'
+  }));
+
+  setConnStatus('Connected to Airtable', true);
+  clearMsg();
+  render();
+}
+
+function loadFallback() {
+  state.tournaments = [
+    {id:'d1',name:'Schools Challenge',location:'Bill Norris Fields, Beenleigh',date:'2026-04-01',end:'2026-04-02',budget:0,status:'Complete'},
+    {id:'d2',name:'Junior Mods',location:'Bill Norris Fields, Beenleigh',date:'2026-08-29',end:'2026-08-30',budget:0,status:'Planning'},
+    {id:'d3',name:'Qld Junior All Nations',location:'Runaway Bay',date:'2026-11-13',end:'2026-11-15',budget:0,status:'Planning'},
+    {id:'d4',name:'NSW Junior All Nations',location:'Tuggerah, Central Coast',date:'2026-11-20',end:'2026-11-22',budget:0,status:'Planning'},
+    {id:'d5',name:'Qld Seniors All Nations',location:'Runaway Bay',date:'2027-01-15',end:'2027-01-17',budget:0,status:'Planning'},
+  ];
+  state.tasks = [];
+  state.costs = [];
+  render();
+}
+
+function setConnStatus(text, connected) {
+  const el = document.getElementById('conn-status');
+  if (el) { el.textContent = text; el.style.color = connected ? '#4ade80' : '#f87171'; }
+  const dot = document.querySelector('.status-dot');
+  if (dot) dot.style.background = connected ? '#22c55e' : '#ef4444';
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function ini(n) { return (n||'??').slice(0,2).toUpperCase(); }
+function avEl(name, size) {
+  size = size || 28;
+  return `<div class="av av-${name}" style="width:${size}px;height:${size}px;">${ini(name)}</div>`;
+}
+function fmtDate(d) { if(!d) return '—'; const p=d.split('-'); return `${p[2]}/${p[1]}/${p[0]}`; }
+function today() { const t=new Date(); t.setHours(0,0,0,0); return t; }
+function daysTo(d) { if(!d) return 9999; const t=new Date(d); t.setHours(0,0,0,0); return Math.round((t-today())/86400000); }
+function statusBadge(s) { const m={Planning:'b-blue',Active:'b-green',Complete:'b-gray',Completed:'b-gray'}; return `<span class="badge ${m[s]||'b-gray'}">${s}</span>`; }
+function dueBadge(d, done) {
+  if(done) return '<span class="badge b-green">Done</span>';
+  const n=daysTo(d);
+  const cls=n<0?'due-late':n<=7?'due-warn':'due-ok';
+  const lbl=n<0?`${Math.abs(n)}d late`:n===0?'Today':`${n}d`;
+  return `<span class="task-due ${cls}">${lbl}</span>`;
+}
+function showMsg(msg, type) {
+  document.getElementById('msg-area').innerHTML = `<div class="msg-bar msg-${type}">${msg}</div>`;
+}
+function clearMsg() { document.getElementById('msg-area').innerHTML = ''; }
+function showInline(id, msg, color) {
+  const el = document.getElementById(id);
+  if(el) { el.textContent = msg; el.style.color = color === 'error' ? '#f87171' : '#4ade80'; }
+  setTimeout(() => { if(el) el.textContent = ''; }, 3000);
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function show(sec, btn) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('visible'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('s-'+sec).classList.add('visible');
+  btn.classList.add('active');
+  render();
+}
+
+function populateSelects() {
+  const opts = state.tournaments.map(t=>`<option value="${t.name}">${t.name}</option>`).join('');
+  ['t-tourn','c-tourn','tpl-tourn'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){const v=el.value;el.innerHTML=opts;if(v)el.value=v;}
+  });
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function render() {
+  populateSelects();
+  renderDashboard();
+  renderTournaments();
+  renderTasks();
+  renderCosts();
+  renderNinety();
+  renderTeam();
+}
+
+function renderDashboard() {
+  const totalBudget = state.tournaments.reduce((a,t)=>a+Number(t.budget||0),0);
+  const totalSpent = state.costs.filter(c=>c.status==='Paid').reduce((a,c)=>a+Number(c.amount),0);
+  const openTasks = state.tasks.filter(t=>!t.done).length;
+  const lateTasks = state.tasks.filter(t=>!t.done&&daysTo(t.due)<0).length;
+
+  document.getElementById('dash-stats').innerHTML =
+    `<div class="stat-card"><div class="stat-val">${state.tournaments.length}</div><div class="stat-label">Tournaments</div></div>` +
+    `<div class="stat-card"><div class="stat-val">${totalBudget>0?'$'+totalBudget.toLocaleString():'TBC'}</div><div class="stat-label">Total budget</div></div>` +
+    `<div class="stat-card"><div class="stat-val">${openTasks}</div><div class="stat-label">Open tasks</div></div>` +
+    `<div class="stat-card${lateTasks>0?' accent':''}"><div class="stat-val">${lateTasks}</div><div class="stat-label">Overdue</div></div>`;
+
+  const sorted = state.tournaments.slice().sort((a,b)=>new Date(a.date)-new Date(b.date));
+  document.getElementById('dash-tournaments').innerHTML = sorted.map(t=>{
+    const d=daysTo(t.date);
+    const dLabel=d<0?'Completed':d===0?'Today':d+' days away';
+    const tTasks=state.tasks.filter(tk=>tk.tournament===t.name);
+    const done=tTasks.filter(tk=>tk.done).length;
+    const spent=state.costs.filter(c=>c.tournament===t.name&&c.status==='Paid').reduce((a,c)=>a+Number(c.amount),0);
+    const pct=t.budget>0?Math.round(spent/t.budget*100):0;
+    return `<div class="card">
+      <div class="card-header"><span class="card-title">${t.name}</span>${statusBadge(t.status)}</div>
+      <div class="meta">${t.location} · ${fmtDate(t.date)}${t.end&&t.end!==t.date?' – '+fmtDate(t.end):''} · ${dLabel}</div>
+      <div style="display:flex;gap:16px;margin-top:6px;font-size:12px;color:var(--text3);">
+        <span>Budget: <strong style="color:var(--text)">${t.budget>0?'$'+Number(t.budget).toLocaleString():'TBC'}</strong></span>
+        <span>Spent: <strong style="color:var(--text)">$${spent.toLocaleString()}</strong></span>
+        <span>Tasks: <strong style="color:var(--text)">${done}/${tTasks.length}</strong></span>
+      </div>
+      ${t.budget>0?`<div class="progress"><div class="progress-fill" style="width:${Math.min(pct,100)}%;background:${spent>t.budget?'#ef4444':'var(--accent)'}"></div></div>`:''}
+    </div>`;
+  }).join('') || '<p class="empty">No tournaments yet</p>';
+
+  const upcoming = state.tasks.filter(t=>!t.done).sort((a,b)=>new Date(a.due)-new Date(b.due)).slice(0,6);
+  document.getElementById('dash-deadlines').innerHTML = upcoming.length ? upcoming.map(t=>{
+    const d=daysTo(t.due);
+    const cls=d<0?'due-late':d<=7?'due-warn':'due-ok';
+    const lbl=d<0?`${Math.abs(d)}d late`:d===0?'Today':`${d}d left`;
+    return `<div class="task-row">${avEl(t.owner,26)}
+      <div style="flex:1;margin-left:6px;"><span class="task-text">${t.name}</span><span class="meta"> · ${t.tournament}</span></div>
+      <span style="font-size:11px;color:var(--text3);margin-right:8px;">${t.owner}</span>
+      <span class="task-due ${cls}">${lbl}</span></div>`;
+  }).join('') : '<p class="empty">No tasks yet — apply the 6-week template to get started</p>';
+}
+
+function renderTournaments() {
+  const sorted = state.tournaments.slice().sort((a,b)=>new Date(a.date)-new Date(b.date));
+  document.getElementById('tournament-list').innerHTML = sorted.map(t=>{
+    const tTasks=state.tasks.filter(tk=>tk.tournament===t.name);
+    const done=tTasks.filter(tk=>tk.done).length;
+    const d=daysTo(t.date);
+    const dLabel=d<0?'Completed':d===0?'Today':d+' days away';
+    return `<div class="card">
+      <div class="card-header"><span class="card-title">${t.name}</span>${statusBadge(t.status)}</div>
+      <div class="meta">${t.location} · ${fmtDate(t.date)}${t.end&&t.end!==t.date?' – '+fmtDate(t.end):''} · ${dLabel}</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:4px;">Tasks: ${done}/${tTasks.length} · Budget: ${t.budget>0?'$'+Number(t.budget).toLocaleString():'TBC'}</div>
+      <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">
+        <button class="btn btn-ghost btn-sm" onclick="cycleStatus('${t.id}','${t.status}')">Change status</button>
+        <button class="btn btn-ghost btn-sm" onclick="applyToT('${t.name}','${t.date}')">Apply 6-week template</button>
+        <button class="btn btn-danger" onclick="deleteTournament('${t.id}','${t.name}')">Remove</button>
+      </div>
+    </div>`;
+  }).join('') || '<p class="empty">No tournaments yet</p>';
+}
+
+function renderTasks() {
+  const filters = ['All', ...state.tournaments.map(t=>t.name)];
+  document.getElementById('task-filters').innerHTML = filters.map(f=>
+    `<button class="filter-tab${taskFilter===f?' active':''}" onclick="setTF('${f}',this)">${f}</button>`
+  ).join('');
+  const toShow = taskFilter==='All' ? state.tasks : state.tasks.filter(t=>t.tournament===taskFilter);
+  const byT = {};
+  toShow.forEach(t=>{if(!byT[t.tournament])byT[t.tournament]=[];byT[t.tournament].push(t);});
+  let html = '';
+  Object.keys(byT).forEach(tname=>{
+    html += `<p class="sh">${tname||'Unknown'}</p>`;
+    html += byT[tname].sort((a,b)=>new Date(a.due)-new Date(b.due)).map(task=>`
+      <div class="task-row">
+        <div class="task-check${task.done?' done':''}" onclick="toggleTask('${task.id}',${!task.done})">${task.done?'✓':''}</div>
+        ${avEl(task.owner,24)}
+        <span class="task-text${task.done?' done':''}" style="flex:1;margin-left:6px;">${task.name}</span>
+        <span class="badge b-gray" style="font-size:10px;margin-right:6px;">${task.cat}</span>
+        <span style="font-size:11px;color:var(--text3);margin-right:8px;">${task.owner}</span>
+        ${dueBadge(task.due,task.done)}
+        <span onclick="openEditTaskModal('${task.id}')" style="cursor:pointer;color:var(--text3);margin-left:6px;font-size:14px;">✏️</span>
+        <span onclick="deleteTask('${task.id}')" style="cursor:pointer;color:var(--text3);margin-left:4px;font-size:16px;">×</span>
+      </div>`).join('');
+  });
+  document.getElementById('task-list').innerHTML = html || '<p class="empty">No tasks yet — use the 6-week plan to apply a template</p>';
+}
+
+function setTF(f, btn) {
+  taskFilter = f;
+  document.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTasks();
+}
+
+function renderCosts() {
+  const byT = {};
+  state.costs.forEach(c=>{if(!byT[c.tournament])byT[c.tournament]=[];byT[c.tournament].push(c);});
+  let html = '';
+  if(!Object.keys(byT).length){document.getElementById('cost-list').innerHTML='<p class="empty">No expenses yet</p>';return;}
+  Object.keys(byT).forEach(tname=>{
+    const costs=byT[tname];
+    const total=costs.reduce((a,c)=>a+Number(c.amount),0);
+    const totalActual=costs.reduce((a,c)=>a+(Number(c.actual)||0),0);
+    const t=state.tournaments.find(x=>x.name===tname);
+    const budget=t?Number(t.budget):0;
+    html+=`<p class="sh">${tname}</p><div class="card">`;
+    html+=costs.map(c=>{
+      const sc={Paid:'b-green',Ordered:'b-amber',Budgeted:'b-blue'}[c.status]||'b-gray';
+      return `<div class="cost-row">
+        <div><div style="color:var(--text);">${c.name}</div><div class="meta">${c.cat}</div></div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="badge ${sc}">${c.status}</span>
+          <span style="font-weight:600;min-width:60px;text-align:right;font-family:'DM Mono',monospace;">
+          Budget: $${Number(c.amount).toLocaleString()}
+          ${c.actual>0?' | Actual: $'+Number(c.actual).toLocaleString():''}
+        </span>
+          <span onclick="openEditModal('${c.id}')" style="cursor:pointer;color:var(--text3);margin-right:6px;font-size:14px;">✏️</span>
+        <span onclick="deleteCost('${c.id}')" style="cursor:pointer;color:var(--text3);font-size:16px;">×</span>
+        </div></div>`;
+    }).join('');
+    html+=`<div style="display:flex;justify-content:space-between;padding:10px 0 0;font-weight:600;font-size:13px;border-top:1px solid var(--border);margin-top:4px;">
+      <span style="color:var(--text3);">Total${budget>0?' vs budget':''}</span>
+      <span style="font-family:'DM Mono',monospace;">
+        Budgeted: $${total.toLocaleString()}${budget>0?' / $'+budget.toLocaleString():''}
+        ${totalActual>0?' | Actual: $'+totalActual.toLocaleString():''}
+      </span></div>`;
+    if(budget>0){const pct=Math.round(total/budget*100);html+=`<div class="progress"><div class="progress-fill" style="width:${Math.min(pct,100)}%;background:${total>budget?'#ef4444':'var(--accent)'}"></div></div>`;}
+    html+='</div>';
+  });
+  document.getElementById('cost-list').innerHTML = html;
+}
+
+function renderNinety() {
+  const el = document.getElementById('ninety-list');
+  if(!el) return;
+  el.innerHTML = Object.entries(NINETY).map(([name,items])=>{
+    const key=`ninety_${name}`;
+    const done=ninetyDone[key]||[];
+    const doneCount=items.filter((_,i)=>done.includes(i)).length;
+    return `<div class="card" style="margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+        ${avEl(name,36)}
+        <span style="font-size:14px;font-weight:600;">${name}</span>
+        <span class="badge ${doneCount===items.length?'b-green':doneCount>0?'b-amber':'b-gray'}" style="margin-left:auto;">${doneCount}/${items.length}</span>
+      </div>
+      ${items.map((item,i)=>{
+        const isDone=done.includes(i);
+        return `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);">
+          <div class="ninety-check${isDone?' done':''}" onclick="toggleNinety('${name}',${i})">${isDone?'✓':''}</div>
+          <span style="font-size:13px;${isDone?'text-decoration:line-through;color:var(--text3);':''}">${item}</span>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }).join('');
+}
+
+function renderTeam() {
+  const el = document.getElementById('team-list');
+  if(!el) return;
+  el.innerHTML = TEAM.map(name=>{
+    const myTasks=state.tasks.filter(t=>t.owner===name);
+    const open=myTasks.filter(t=>!t.done).length;
+    const late=myTasks.filter(t=>!t.done&&daysTo(t.due)<0).length;
+    const done=myTasks.filter(t=>t.done).length;
+    const n90=NINETY[name]||[];
+    const n90done=(ninetyDone[`ninety_${name}`]||[]).length;
+    const badge=late>0?`<span class="badge b-red">${late} overdue</span>`:open===0?'<span class="badge b-green">All clear</span>':'<span class="badge b-blue">On track</span>';
+    return `<div class="team-card">
+      ${avEl(name,42)}
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:600;margin-bottom:3px;">${name}</div>
+        <div class="meta">Tasks: ${open} open · ${done} done${late>0?` · <span style="color:#f87171;">${late} overdue</span>`:''}</div>
+        <div class="meta">90-day: ${n90done}/${n90.length} complete</div>
+      </div>
+      ${badge}
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// ACTIONS
+// ============================================================
+async function addTournament() {
+  const name=document.getElementById('tn-name').value.trim();
+  const start=document.getElementById('tn-start').value;
+  const end=document.getElementById('tn-end').value;
+  const loc=document.getElementById('tn-loc').value.trim();
+  const budget=document.getElementById('tn-budget').value;
+  const status=document.getElementById('tn-status').value;
+  if(!name){showInline('tn-msg','Please enter a name','error');return;}
+  showInline('tn-msg','Saving...','success');
+  try {
+    const rec = await atPost('Tournaments',{'Name':name,'Location':loc||'TBC','Start Date':start||undefined,'End Date':end||undefined,'Budget':Number(budget)||0,'Status':status});
+    state.tournaments.push({id:rec.id,name,location:loc||'TBC',date:start,end,budget:Number(budget)||0,status});
+    ['tn-name','tn-start','tn-end','tn-loc','tn-budget'].forEach(id=>document.getElementById(id).value='');
+    showInline('tn-msg','Tournament saved to Airtable!','success');
+    render();
+  } catch(e){showInline('tn-msg','Error saving — check connection','error');}
+}
+
+async function addTask() {
+  const name=document.getElementById('t-name').value.trim();
+  const tourn=document.getElementById('t-tourn').value;
+  const owner=document.getElementById('t-owner').value;
+  const due=document.getElementById('t-due').value;
+  const cat=document.getElementById('t-cat').value;
+  if(!name){showInline('t-msg','Please enter a task name','error');return;}
+  showInline('t-msg','Saving...','success');
+  try {
+    const rec = await atPost('Tasks',{'Name':name,'Tournament':tourn,'Owner':owner,'Due Date':due||undefined,'Category':cat,'Done':false});
+    state.tasks.push({id:rec.id,name,tournament:tourn,owner,due,cat,done:false});
+    document.getElementById('t-name').value='';
+    document.getElementById('t-due').value='';
+    showInline('t-msg','Task saved!','success');
+    render();
+  } catch(e){showInline('t-msg','Error saving','error');}
+}
+
+async function addCost() {
+  const name=document.getElementById('c-name').value.trim();
+  const tourn=document.getElementById('c-tourn').value;
+  const amt=document.getElementById('c-budget-amt').value;
+  const actual=document.getElementById('c-actual-amt').value;
+  const cat=document.getElementById('c-cat').value;
+  const status=document.getElementById('c-status').value;
+  if(!name){showInline('c-msg','Please enter a description','error');return;}
+  showInline('c-msg','Saving...','success');
+  try {
+    const rec = await atPost('Costs',{'Name':name,'Tournament':tourn,'Amount':Number(amt)||0,'Category':cat,'Status':status});
+    state.costs.push({id:rec.id,name,tournament:tourn,amount:Number(amt)||0,cat,status});
+    document.getElementById('c-name').value='';
+    document.getElementById('c-amt').value='';
+    showInline('c-msg','Expense saved!','success');
+    render();
+  } catch(e){showInline('c-msg','Error saving','error');}
+}
+
+async function toggleTask(id, newDone) {
+  try { await atPatch('Tasks',id,{'Done':newDone}); } catch(e){}
+  const t=state.tasks.find(x=>x.id===id);
+  if(t)t.done=newDone;
+  render();
+}
+
+async function deleteTask(id) {
+  if(!confirm('Delete this task?'))return;
+  try { await atDelete('Tasks',id); } catch(e){}
+  state.tasks=state.tasks.filter(x=>x.id!==id);
+  render();
+}
+
+async function deleteCost(id) {
+  if(!confirm('Delete this expense?'))return;
+  try { await atDelete('Costs',id); } catch(e){}
+  state.costs=state.costs.filter(x=>x.id!==id);
+  render();
+}
+
+async function deleteTournament(id, name) {
+  if(!confirm(`Remove ${name}?`))return;
+  try { await atDelete('Tournaments',id); } catch(e){}
+  state.tournaments=state.tournaments.filter(x=>x.id!==id);
+  render();
+}
+
+async function cycleStatus(id, currentStatus) {
+  const cycle=['Planning','Active','Complete'];
+  const newStatus=cycle[(cycle.indexOf(currentStatus)+1)%cycle.length];
+  try { await atPatch('Tournaments',id,{'Status':newStatus}); } catch(e){}
+  const t=state.tournaments.find(x=>x.id===id);
+  if(t)t.status=newStatus;
+  render();
+}
+
+// Template
+const TPL = [
+  {name:'Signed contracts + blue cards for officials',cat:'Officials',wk:6,owner:'Kez'},
+  {name:'Lock in officials + ref uniform order',cat:'Officials',wk:6,owner:'Kez'},
+  {name:'Send tournament info to all',cat:'Comms',wk:6,owner:'Sienna'},
+  {name:'Create WhatsApp group for tournament',cat:'Logistics',wk:6,owner:'Teagz'},
+  {name:'Activations locked',cat:'Event Prep',wk:6,owner:'Teagz'},
+  {name:'Official kit reveal content',cat:'Content',wk:6,owner:'Matt'},
+  {name:'Email rosters to officials',cat:'Officials',wk:5,owner:'Kez'},
+  {name:'Sponsor + VIP invites sent',cat:'Comms',wk:5,owner:'Sienna'},
+  {name:'Division + pools content',cat:'Content',wk:5,owner:'Matt'},
+  {name:'Sort prizes into boxes',cat:'Event Prep',wk:5,owner:'Ebony'},
+  {name:'Refs and officials comms',cat:'Comms',wk:5,owner:'Kez'},
+  {name:'Vendor map + vendor posts',cat:'Comms',wk:4,owner:'Sienna'},
+  {name:'Field map / info / draw',cat:'Event Prep',wk:4,owner:'Teagz'},
+  {name:'Roster changes confirmed',cat:'Officials',wk:4,owner:'Kez'},
+  {name:'Letter box drop',cat:'Marketing',wk:4,owner:'Matt'},
+  {name:'Sponsor content + styles',cat:'Content',wk:4,owner:'Matt'},
+  {name:'Presentation + ref days',cat:'Officials',wk:3,owner:'Kez'},
+  {name:'Replacement players confirmed',cat:'Registration',wk:3,owner:'Kez'},
+  {name:'Staff presentation',cat:'Event Prep',wk:3,owner:'Teagz'},
+  {name:'Sponsors shoutout content',cat:'Content',wk:3,owner:'Matt'},
+  {name:'Truck booking',cat:'Logistics',wk:3,owner:'Ebony'},
+  {name:'Ref day',cat:'Officials',wk:2,owner:'Kez'},
+  {name:'Final tournament info send',cat:'Comms',wk:2,owner:'Sienna'},
+  {name:'Last year MVP content',cat:'Content',wk:2,owner:'Matt'},
+  {name:'Managers confirmation email',cat:'Comms',wk:2,owner:'Sienna'},
+  {name:'Ground keeping briefing',cat:'Event Prep',wk:2,owner:'Ebony'},
+  {name:'Printing field boxes',cat:'Event Prep',wk:2,owner:'Ebony'},
+  {name:'Field set up + line marking',cat:'Event Prep',wk:1,owner:'Ebony'},
+  {name:'Officials check in',cat:'Officials',wk:1,owner:'Kez'},
+  {name:'Road to finals graphic',cat:'Content',wk:1,owner:'Matt'},
+  {name:'Shopping + event supplies',cat:'Event Prep',wk:1,owner:'Ebony'},
+  {name:'Last year champs content',cat:'Content',wk:1,owner:'Matt'},
+  {name:'Key collection + drop off',cat:'Logistics',wk:1,owner:'Teagz'},
+];
+
+async function applyTemplate() {
+  const tourn=document.getElementById('tpl-tourn').value;
+  const dateOverride=document.getElementById('tpl-date').value;
+  const t=state.tournaments.find(x=>x.name===tourn);
+  if(!t){showInline('tpl-msg','Select a tournament','error');return;}
+  const eventDate=new Date(dateOverride||t.date);
+  showInline('tpl-msg','Applying...','success');
+  let added=0;
+  for(const tpl of TPL){
+    const due=new Date(eventDate);
+    due.setDate(due.getDate()-((tpl.wk-1)*7));
+    const dueStr=due.toISOString().split('T')[0];
+    try {
+      const rec=await atPost('Tasks',{'Name':tpl.name,'Tournament':tourn,'Owner':tpl.owner,'Due Date':dueStr,'Category':tpl.cat,'Done':false});
+      state.tasks.push({id:rec.id,name:tpl.name,tournament:tourn,owner:tpl.owner,due:dueStr,cat:tpl.cat,done:false});
+    } catch(e){
+      state.tasks.push({id:'tmp'+Date.now()+added,name:tpl.name,tournament:tourn,owner:tpl.owner,due:dueStr,cat:tpl.cat,done:false});
+    }
+    added++;
+  }
+  showInline('tpl-msg',`${added} tasks applied!`,'success');
+  render();
+}
+
+async function applyToT(name, date) {
+  if(!confirm(`Apply 6-week template to ${name}? This adds ${TPL.length} tasks.`))return;
+  const eventDate=new Date(date);
+  let added=0;
+  for(const tpl of TPL){
+    const due=new Date(eventDate);
+    due.setDate(due.getDate()-((tpl.wk-1)*7));
+    const dueStr=due.toISOString().split('T')[0];
+    try {
+      const rec=await atPost('Tasks',{'Name':tpl.name,'Tournament':name,'Owner':tpl.owner,'Due Date':dueStr,'Category':tpl.cat,'Done':false});
+      state.tasks.push({id:rec.id,name:tpl.name,tournament:name,owner:tpl.owner,due:dueStr,cat:tpl.cat,done:false});
+    } catch(e){
+      state.tasks.push({id:'tmp'+Date.now()+added,name:tpl.name,tournament:name,owner:tpl.owner,due:dueStr,cat:tpl.cat,done:false});
+    }
+    added++;
+  }
+  showMsg(`${added} tasks applied to ${name} and saved to Airtable!`,'success');
+  setTimeout(clearMsg,4000);
+  render();
+}
+
+function toggleNinety(name, idx) {
+  const key=`ninety_${name}`;
+  let done=ninetyDone[key]||[];
+  if(done.includes(idx)){done=done.filter(i=>i!==idx);}else{done.push(idx);}
+  ninetyDone[key]=done;
+  try{localStorage.setItem('3ptag_ninety',JSON.stringify(ninetyDone));}catch(e){}
+  renderNinety();
+  renderTeam();
+}
+
+// ============================================================
+// EDIT FUNCTIONS
+// ============================================================
+function openEditModal(id) {
+  const c = state.costs.find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('edit-id').value = id;
+  document.getElementById('edit-name').value = c.name;
+  document.getElementById('edit-budget').value = c.amount || '';
+  document.getElementById('edit-actual').value = c.actual || '';
+  document.getElementById('edit-cat').value = c.cat;
+  document.getElementById('edit-status').value = c.status;
+  document.getElementById('edit-modal').style.display = 'flex';
+}
+
+function closeEditModal() {
+  document.getElementById('edit-modal').style.display = 'none';
+}
+
+async function saveEdit() {
+  const id = document.getElementById('edit-id').value;
+  const name = document.getElementById('edit-name').value.trim();
+  const budget = document.getElementById('edit-budget').value;
+  const actual = document.getElementById('edit-actual').value;
+  const cat = document.getElementById('edit-cat').value;
+  const status = document.getElementById('edit-status').value;
+  if (!name) return;
+  try {
+    await atPatch('Costs', id, {
+      'Description': name,
+      'Budgeted Amount': Number(budget) || 0,
+      'Actual Amount': Number(actual) || 0,
+      'Category': cat,
+      'Status': status
+    });
+    const c = state.costs.find(x => x.id === id);
+    if (c) { c.name = name; c.amount = Number(budget) || 0; c.actual = Number(actual) || 0; c.cat = cat; c.status = status; }
+    closeEditModal();
+    render();
+  } catch(e) {
+    alert('Error saving — please try again');
+  }
+}
+
+function openEditTaskModal(id) {
+  const t = state.tasks.find(x => x.id === id);
+  if (!t) return;
+  document.getElementById('edit-task-id').value = id;
+  document.getElementById('edit-task-name').value = t.name;
+  document.getElementById('edit-task-owner').value = t.owner;
+  document.getElementById('edit-task-due').value = t.due;
+  document.getElementById('edit-task-cat').value = t.cat;
+  document.getElementById('edit-task-modal').style.display = 'flex';
+}
+
+function closeEditTaskModal() {
+  document.getElementById('edit-task-modal').style.display = 'none';
+}
+
+async function saveTaskEdit() {
+  const id = document.getElementById('edit-task-id').value;
+  const name = document.getElementById('edit-task-name').value.trim();
+  const owner = document.getElementById('edit-task-owner').value;
+  const due = document.getElementById('edit-task-due').value;
+  const cat = document.getElementById('edit-task-cat').value;
+  if (!name) return;
+  try {
+    await atPatch('Tasks', id, {
+      'Description': name,
+      'Owner': owner,
+      'Due Date': due || undefined,
+      'Category': cat
+    });
+    const t = state.tasks.find(x => x.id === id);
+    if (t) { t.name = name; t.owner = owner; t.due = due; t.cat = cat; }
+    closeEditTaskModal();
+    render();
+  } catch(e) {
+    alert('Error saving — please try again');
+  }
+}
+
+// Close modals when clicking outside
+document.getElementById('edit-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeEditModal();
+});
+document.getElementById('edit-task-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeEditTaskModal();
+});
+
+// ============================================================
+// INIT
+// ============================================================
+loadAll();
+</script>
+</body>
+</html>
